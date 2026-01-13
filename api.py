@@ -6,10 +6,12 @@ app = FastAPI()
 
 last_event = None  # guarda o ultimo evento recebido
 
+
 class Event(BaseModel):
     sent_ts: float
     caption: str
     aux: dict | None = None
+
 
 @app.post("/ingest")
 def ingest(ev: Event):
@@ -33,6 +35,7 @@ def ingest(ev: Event):
         "echo_caption": ev.caption,
     }
 
+
 @app.get("/status")
 def get_status():
     if last_event is None:
@@ -41,5 +44,5 @@ def get_status():
     return {
         "status": "ok",
         "message": "Ultimo evento registrado:",
-        "last_event": last_event
+        "last_event": last_event,
     }

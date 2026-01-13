@@ -6,8 +6,9 @@ import os
 from collections import deque
 
 API_URL_POST = "http://127.0.0.1:8000/ingest"
-API_URL_GET  = "http://127.0.0.1:8000/status"
+API_URL_GET = "http://127.0.0.1:8000/status"
 SNAPSHOT_DIR = "snapshots"
+
 
 def main():
     os.makedirs(SNAPSHOT_DIR, exist_ok=True)
@@ -28,10 +29,10 @@ def main():
     rtt_hist = deque(maxlen=100)
 
     # para guardar as ultimas metricas calculadas
-    last_upload_ms   = None
-    last_proc_ms     = None
+    last_upload_ms = None
+    last_proc_ms = None
     last_download_ms = None
-    last_rtt_ms      = None
+    last_rtt_ms = None
 
     detecting = False
 
@@ -46,18 +47,23 @@ def main():
 
         if not detecting:
             cv2.putText(
-                frame, "PRESSIONE ESPACO PARA INICIAR",
-                (16, 32), cv2.FONT_HERSHEY_SIMPLEX, 0.8,
-                (0, 0, 255), 2, cv2.LINE_AA
+                frame,
+                "PRESSIONE ESPACO PARA INICIAR",
+                (16, 32),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.8,
+                (0, 0, 255),
+                2,
+                cv2.LINE_AA,
             )
             cv2.imshow("Reactive Cam -> API", frame)
 
             key = cv2.waitKey(1) & 0xFF
-            if key == 32:      # ESPACO
+            if key == 32:  # ESPACO
                 detecting = True
-            elif key == 27:    # ESC
+            elif key == 27:  # ESC
                 break
-            elif key == ord('g'):
+            elif key == ord("g"):
                 # mesmo pausado, permitir snapshot simples (sem POST/GET)
                 ts = time.time()
                 fname = os.path.join(SNAPSHOT_DIR, f"snapshot_{int(ts)}.jpg")
@@ -86,8 +92,14 @@ def main():
         caption = f"{ilum} | {mov}"
 
         cv2.putText(
-            frame, caption, (16, 32),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2, cv2.LINE_AA
+            frame,
+            caption,
+            (16, 32),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.8,
+            (0, 255, 0),
+            2,
+            cv2.LINE_AA,
         )
 
         t_client_send = time.time()
@@ -97,12 +109,9 @@ def main():
                 json={
                     "sent_ts": t_client_send,
                     "caption": caption,
-                    "aux": {
-                        "brightness": brightness,
-                        "motion_level": motion_level
-                    }
+                    "aux": {"brightness": brightness, "motion_level": motion_level},
                 },
-                timeout=0.5
+                timeout=0.5,
             )
             t_client_recv = time.time()
 
@@ -112,31 +121,39 @@ def main():
             server_recv_ts = data["server_recv_ts"]
             server_send_ts = data["server_send_ts"]
 
-            upload_ms   = (server_recv_ts - t_client_send) * 1000.0
-            proc_ms     = (server_send_ts - server_recv_ts) * 1000.0
+            upload_ms = (server_recv_ts - t_client_send) * 1000.0
+            proc_ms = (server_send_ts - server_recv_ts) * 1000.0
             download_ms = (t_client_recv - server_send_ts) * 1000.0
-            rtt_ms      = (t_client_recv - t_client_send) * 1000.0
+            rtt_ms = (t_client_recv - t_client_send) * 1000.0
 
             rtt_hist.append(rtt_ms)
             rtt_avg_ms = float(np.mean(rtt_hist))
 
             # guarda ultimas metricas
-            last_upload_ms   = upload_ms
-            last_proc_ms     = proc_ms
+            last_upload_ms = upload_ms
+            last_proc_ms = proc_ms
             last_download_ms = download_ms
-            last_rtt_ms      = rtt_ms
+            last_rtt_ms = rtt_ms
 
             cv2.putText(
                 frame,
                 f"RTT: {rtt_ms:.1f} ms (media {rtt_avg_ms:.1f} ms)",
                 (16, 64),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2, cv2.LINE_AA
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                (0, 255, 255),
+                2,
+                cv2.LINE_AA,
             )
             cv2.putText(
                 frame,
                 f"UP: {upload_ms:.1f} | PROC: {proc_ms:.1f} | DOWN: {download_ms:.1f} ms",
                 (16, 96),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2, cv2.LINE_AA
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                (255, 255, 0),
+                2,
+                cv2.LINE_AA,
             )
 
         except Exception as e:
@@ -144,18 +161,22 @@ def main():
                 frame,
                 f"Erro API: {type(e).__name__}",
                 (16, 64),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2, cv2.LINE_AA
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                (0, 0, 255),
+                2,
+                cv2.LINE_AA,
             )
 
         cv2.imshow("Reactive Cam -> API", frame)
 
         key = cv2.waitKey(1) & 0xFF
 
-        if key == 32:      # ESPACO
+        if key == 32:  # ESPACO
             detecting = not detecting
-        elif key == 27:    # ESC
+        elif key == 27:  # ESC
             break
-        elif key == ord('g'):
+        elif key == ord("g"):
             # ---------- AQUI ENTRA O SNAPSHOT + GET ----------
             ts = time.time()
             fname = os.path.join(SNAPSHOT_DIR, f"snapshot_{int(ts)}.jpg")
@@ -185,6 +206,7 @@ def main():
 
     cap.release()
     cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     main()
