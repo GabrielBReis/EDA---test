@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from time import time, sleep
+from time import time
 
 app = FastAPI()
 
