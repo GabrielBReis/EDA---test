@@ -47,9 +47,7 @@ def get_status():
         "last_event": last_event,
     }
 
+
 @app.get("/health")
 def health():
-    return {
-        "status": "ok",
-        "server_ts": time()
-    }
+    return {"status": "ok", "server_ts": time()}
