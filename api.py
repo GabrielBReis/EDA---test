@@ -46,3 +46,10 @@ def get_status():
         "message": "Ultimo evento registrado:",
         "last_event": last_event,
     }
+
+@app.get("/health")
+def health():
+    return {
+        "status": "ok",
+        "server_ts": time()
+    }
