@@ -6,6 +6,8 @@ app = FastAPI()
 
 last_event = None  # guarda o ultimo evento recebido
 
+#testando
+
 
 class Event(BaseModel):
     sent_ts: float
