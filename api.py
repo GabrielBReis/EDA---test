@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from time import time, sleep
+from time import time
 
 app = FastAPI()
 
@@ -46,3 +46,8 @@ def get_status():
         "message": "Ultimo evento registrado:",
         "last_event": last_event,
     }
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "server_ts": time()}

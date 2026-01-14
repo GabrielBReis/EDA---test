@@ -20,3 +20,12 @@ def test_ingest_and_status():
     data = s.json()
     assert "last_event" in data
     assert data["last_event"]["caption"] == "Claro | Parado"
+
+
+def test_health():
+    r = client.get("/health")
+    assert r.status_code == 200
+    data = r.json()
+    assert data["status"] == "ok"
+    assert "server_ts" in data
+    assert isinstance(data["server_ts"], (int, float))
